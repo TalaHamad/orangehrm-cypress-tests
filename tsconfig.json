@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "resolveJsonModule": true,
+        "target": "es2019",
+        "module": "commonjs",
+        "rootDir": "cypress",
+        "skipLibCheck": true,
+        "strict": true,
+        "noImplicitAny": false,
+        "strictNullChecks": false,
+        "moduleResolution": "node",
+        "baseUrl": "./",
+        "paths": {
+            "@pageObjects/*": ["cypress/pageObjects/*"],
+            "@common/*": ["cypress/e2e/common/*"],
+            "@support/*": ["cypress/support/*"],
+            "@plugins/*": ["cypress/plugins/*"],
+            "@legacyE2E/*": ["cypress/e2e/*"],
+            "@e2e/*": ["cypress/e2eNew/*"]
+        },
+        "types": ["node", "cypress"],
+        "esModuleInterop": true
+    },
+    "exclude": ["node_modules"]
+}
