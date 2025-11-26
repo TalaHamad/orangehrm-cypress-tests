@@ -41,14 +41,28 @@ import LoginPageActions from "../pageObjects/loginPage/actions";
 declare global {
   namespace Cypress {
     interface Chainable {
-      login(username: string, password: string): Chainable<void>;
+      login({
+        username,
+        password,
+      }: {
+        username: string;
+        password: string;
+      }): Chainable<void>;
+      logout(): Chainable<void>;
     }
   }
 }
 
-Cypress.Commands.add("login", (username: string, password: string) => {
-  LoginPageActions.visitLoginPage();
-  LoginPageActions.enterUsername(username);
-  LoginPageActions.enterPassword(password);
-  LoginPageActions.clickLoginButton();
+Cypress.Commands.add(
+  "login",
+  ({ username, password }: { username: string; password: string }) => {
+    LoginPageActions.visitLoginPage()
+      .enterUsername(username)
+      .enterPassword(password)
+      .clickLoginButton();
+  }
+);
+
+Cypress.Commands.add("logout", () => {
+  cy.clearCookies();
 });

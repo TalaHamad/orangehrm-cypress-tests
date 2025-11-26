@@ -14,4 +14,12 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import "./commands";
+
+before(() => {
+  cy.login({ username: "Admin", password: "admin123" });
+});
+
+// after(() => {
+//   cy.logout();
+// });

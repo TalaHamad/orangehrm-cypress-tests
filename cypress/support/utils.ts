@@ -16,3 +16,37 @@ export function generateRandomIntegerOfLength(length: number): number {
   const max = Math.pow(10, length) - 1;
   return Math.floor(min + Math.random() * (max - min + 1));
 }
+
+export function getFullUrl({
+  page,
+  endpoint,
+}: {
+  page: string;
+  endpoint: string;
+}) {
+  return `/web/index.php/api/v2/${page}/${endpoint}`;
+}
+
+export function getFullPimUrl(endpoint: string) {
+  return `/web/index.php/api/v2/pim/${endpoint}`;
+}
+
+export function getFullDashboardUrl(endpoint: string) {
+  return `/web/index.php/api/v2/dashboard/${endpoint}`;
+}
+
+export function getFullBuzzUrl(endpoint: string) {
+  return `/web/index.php/api/v2/buzz/${endpoint}`;
+}
+
+export function getFullEventsUrl(endpoint: string) {
+  return `/web/index.php/events/${endpoint}`;
+}
+
+export function getFullRecruitmentUrl(endpoint: string) {
+  return `/web/index.php/api/v2/recruitment/${endpoint}`;
+}
+
+export function getFullAdminUrl(endpoint: string) {
+  return `/web/index.php/api/v2/admin/${endpoint}`;
+}

@@ -7,6 +7,6 @@ export const getEmployee = (prefix: string = getPrefix()): NewEmployee => {
     middleName: "",
     lastName: `${generateRandomIntegerOfLength(5)}`,
     empPicture: null,
-    employeeId: `${generateRandomIntegerOfLength(5)}`,
+    employeeId: `${generateRandomIntegerOfLength(3)}`,
   };
 };

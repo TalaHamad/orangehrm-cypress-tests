@@ -4,10 +4,6 @@ import EmployeeDataUtils from "@pageObjects/employeePage/dataUtils";
 
 const employee = getEmployee();
 
-before(() => {
-  cy.login("Admin", "admin123");
-});
-
 Given("The system has an employee", () => {
   EmployeeDataUtils.createEmployee(employee);
 });

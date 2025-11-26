@@ -1,15 +1,20 @@
-import { ResponseEmployee, NewEmployee } from "./types";
+import { getFullPimUrl } from "@support/utils";
+import { NewEmployee, ResponseEmployee } from "./types";
 
 export default class EmployeeDataUtils {
   static createEmployee(employee: NewEmployee) {
-    return cy.request("POST", "/web/index.php/api/v2/pim/employees", {
-      ...employee,
-    });
+    return cy
+      .request("POST", getFullPimUrl("employees"), {
+        ...employee,
+      })
+      .then((response) => {
+        return response.body.data.empNumber;
+      });
   }
 
   static getEmployees(): Cypress.Chainable<ResponseEmployee[]> {
     return cy
-      .request("GET", "/web/index.php/api/v2/pim/employees?limit=50")
+      .request("GET", getFullPimUrl("employees?limit=50"))
       .then((response) => {
         return response.body.data as ResponseEmployee[];
       });
@@ -36,7 +41,7 @@ export default class EmployeeDataUtils {
       (foundEmployee: ResponseEmployee) => {
         return cy.request({
           method: "DELETE",
-          url: "/web/index.php/api/v2/pim/employees",
+          url: getFullPimUrl("employees"),
           body: {
             ids: [foundEmployee.empNumber],
           },
