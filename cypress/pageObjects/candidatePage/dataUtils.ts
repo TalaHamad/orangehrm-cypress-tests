@@ -1,5 +1,7 @@
 import { getFullRecruitmentUrl } from "@support/utils";
-import { NewCandidate } from "./types";
+import { NewCandidate, ResponseCandidate } from "./types";
+import { mapInterviewToRequest } from "@pageObjects/employeePage/mappers";
+import EmployeeDataUtils from "@pageObjects/employeePage/dataUtils";
 
 export default class CandidateDataUtils {
   static createCandidate(candidate: NewCandidate) {
@@ -10,12 +12,14 @@ export default class CandidateDataUtils {
       });
   }
 
-  static getHiringManagers(): Cypress.Chainable<number[]> {
-    return cy
-      .request("GET", getFullRecruitmentUrl("interviewers?nameOrId=Cypress"))
-      .then((response) => {
-        return response.body.data.map((item: any) => item.empNumber);
-      });
+  static shortlistCandidate({
+    candidateId,
+    note,
+  }: {
+    candidateId: number;
+    note: string;
+  }) {
+    return this.updateCandidateStatus(candidateId, note, "shortlist");
   }
 
   static scheduleInterviewCandidate({
@@ -31,27 +35,20 @@ export default class CandidateDataUtils {
     interviewTime: string;
     note: string;
   }) {
-    return this.getHiringManagers().then((empNumbers) => {
-      const count =
-        Math.floor(Math.random() * Math.min(empNumbers.length, 5)) + 1;
-      const shuffled = empNumbers.sort(() => Math.random() - 0.5);
-      const selected = shuffled.slice(0, count);
-
-      const interviewData = {
-        interviewDate: interviewDate,
-        interviewName: interviewName,
-        interviewTime: interviewTime,
-        note: note,
-        interviewerEmpNumbers: selected,
-      };
-
+    return EmployeeDataUtils.getInterviewers().then((interviewers) => {
       return cy
         .request({
           method: "POST",
           url: getFullRecruitmentUrl(
             `candidates/${candidateId}/shedule-interview`
           ),
-          body: interviewData,
+          body: mapInterviewToRequest(
+            interviewDate,
+            interviewName,
+            interviewTime,
+            note,
+            interviewers
+          ),
         })
         .then((response) => {
           return response.body.data.id; //interviewid
@@ -79,19 +76,91 @@ export default class CandidateDataUtils {
     });
   }
 
-  static updateCandidateStatus({
+  static offerJob({
     candidateId,
     note,
-    endpoint,
   }: {
     candidateId: number;
     note: string;
-    endpoint: "shortlist" | "job/offer" | "job/decline" | "hire" | "reject";
   }) {
+    return this.updateCandidateStatus(candidateId, note, "job/offer");
+  }
+
+  static declineOffer({
+    candidateId,
+    note,
+  }: {
+    candidateId: number;
+    note: string;
+  }) {
+    return this.updateCandidateStatus(candidateId, note, "job/decline");
+  }
+
+  static hireCandidate({
+    candidateId,
+    note,
+  }: {
+    candidateId: number;
+    note: string;
+  }) {
+    return this.updateCandidateStatus(candidateId, note, "hire");
+  }
+
+  static rejectCandidate({
+    candidateId,
+    note,
+  }: {
+    candidateId: number;
+    note: string;
+  }) {
+    return this.updateCandidateStatus(candidateId, note, "reject");
+  }
+
+  private static updateCandidateStatus(
+    candidateId: number,
+    note: string,
+    endpoint: string
+  ) {
     return cy.request({
       method: "PUT",
       url: getFullRecruitmentUrl(`candidates/${candidateId}/${endpoint}`),
       body: { note },
     });
+  }
+
+  static getCandidates(): Cypress.Chainable<ResponseCandidate[]> {
+    return cy
+      .request("GET", getFullRecruitmentUrl("candidates?model=list"))
+      .then((response) => response.body.data as ResponseCandidate[]);
+  }
+
+  static filterOnCandidateID(
+    candidateId: number
+  ): Cypress.Chainable<ResponseCandidate> {
+    return this.getCandidates().then((candidates: ResponseCandidate[]) => {
+      const foundCandidate = candidates.find(
+        (cand: ResponseCandidate) => cand.id === candidateId
+      );
+
+      if (!foundCandidate) {
+        throw new Error(`Candidate with ID ${candidateId} not found`);
+      }
+
+      return foundCandidate;
+    });
+  }
+
+  static deleteCandidate(candidateId: number) {
+    return this.filterOnCandidateID(candidateId).then(
+      (foundCandidate: ResponseCandidate) => {
+        return cy.request({
+          method: "DELETE",
+          url: getFullRecruitmentUrl("candidates"),
+          body: {
+            ids: [foundCandidate.id],
+          },
+        });
+      }
+    );
   }
 }

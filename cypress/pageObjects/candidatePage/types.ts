@@ -11,9 +11,34 @@ export interface NewCandidate {
   vacancyId: number;
 }
 
-export interface ScheduleInterviewData {
-  interviewDate: string;
-  interviewName: string;
-  interviewTime: string;
-  note: string;
+export interface HiringManager {
+  id: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  terminationId: number;
+}
+
+export interface CandidateVacancy {
+  id: number;
+  name: string;
+  status: boolean;
+  hiringManager: HiringManager;
+}
+
+export interface CandidateStatus {
+  id: number;
+  label: string;
+}
+
+export interface ResponseCandidate {
+  id: number;
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  dateOfApplication: string;
+  vacancy: CandidateVacancy;
+  status: CandidateStatus;
+  hasAttachment: boolean;
+  deletable: boolean;
 }

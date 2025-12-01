@@ -1,4 +1,4 @@
-import { getFullPimUrl } from "@support/utils";
+import { getFullPimUrl, getFullRecruitmentUrl } from "@support/utils";
 import { NewEmployee, ResponseEmployee } from "./types";
 
 export default class EmployeeDataUtils {
@@ -13,11 +13,9 @@ export default class EmployeeDataUtils {
   }
 
   static getEmployees(): Cypress.Chainable<ResponseEmployee[]> {
-    return cy
-      .request("GET", getFullPimUrl("employees?limit=50"))
-      .then((response) => {
-        return response.body.data as ResponseEmployee[];
-      });
+    return cy.request("GET", getFullPimUrl("employees")).then((response) => {
+      return response.body.data as ResponseEmployee[];
+    });
   }
 
   static filterOnEmployeeID(
@@ -48,5 +46,16 @@ export default class EmployeeDataUtils {
         });
       }
     );
+  }
+
+  static getInterviewers(): Cypress.Chainable<ResponseEmployee[]> {
+    return cy
+      .request(
+        "GET",
+        getFullRecruitmentUrl("interviewers?nameOrId=CypressEmployee")
+      )
+      .then((response) => {
+        return response.body.data as ResponseEmployee[];
+      });
   }
 }

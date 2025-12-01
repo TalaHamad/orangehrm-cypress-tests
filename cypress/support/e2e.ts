@@ -16,7 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import "./commands";
 
-before(() => {
+beforeEach(() => {
   cy.login({ username: "Admin", password: "admin123" });
 });
 

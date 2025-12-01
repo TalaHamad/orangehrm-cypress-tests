@@ -14,3 +14,10 @@ export interface ResponseEmployee {
   employeeId: string;
   terminationId: string;
 }
+
+export interface InterviewData {
+  interviewDate: string;
+  interviewName: string;
+  interviewTime: string;
+  note: string;
+}
