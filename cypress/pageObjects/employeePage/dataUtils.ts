@@ -7,37 +7,30 @@ export default class EmployeeDataUtils {
       .request("POST", getFullPimUrl("employees"), {
         ...employee,
       })
-      .then((response) => {
-        return response.body.data.empNumber;
-      });
+      .then((response) => response.body.data.empNumber);
   }
 
   static getEmployees(): Cypress.Chainable<ResponseEmployee[]> {
-    return cy.request("GET", getFullPimUrl("employees")).then((response) => {
-      return response.body.data as ResponseEmployee[];
-    });
+    return cy
+      .request("GET", getFullPimUrl("employees"))
+      .then((response) => response.body.data);
   }
 
-  static filterOnEmployeeID(
+  static getEmployeeById(
     employeeId: string
   ): Cypress.Chainable<ResponseEmployee> {
     return this.getEmployees().then((employees: ResponseEmployee[]) => {
       const foundEmployee = employees.find(
         (emp: ResponseEmployee) => emp.employeeId === employeeId
       );
-
-      if (!foundEmployee) {
-        throw new Error(`Employee with ID ${employeeId} not found`);
-      }
-
       return foundEmployee;
     });
   }
 
   static deleteEmployee(employeeId: string) {
-    return this.filterOnEmployeeID(employeeId).then(
-      (foundEmployee: ResponseEmployee) => {
-        return cy.request({
+    this.getEmployeeById(employeeId).then((foundEmployee: ResponseEmployee) => {
+      if (foundEmployee) {
+        cy.request({
           method: "DELETE",
           url: getFullPimUrl("employees"),
           body: {
@@ -45,7 +38,7 @@ export default class EmployeeDataUtils {
           },
         });
       }
-    );
+    });
   }
 
   static getInterviewers(): Cypress.Chainable<ResponseEmployee[]> {
@@ -54,8 +47,6 @@ export default class EmployeeDataUtils {
         "GET",
         getFullRecruitmentUrl("interviewers?nameOrId=CypressEmployee")
       )
-      .then((response) => {
-        return response.body.data as ResponseEmployee[];
-      });
+      .then((response) => response.body.data);
   }
 }

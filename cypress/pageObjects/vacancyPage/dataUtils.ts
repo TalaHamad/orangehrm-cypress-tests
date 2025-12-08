@@ -5,39 +5,30 @@ export default class VacancyDataUtils {
   static createVacancy(vacancy: NewVacancy) {
     return cy
       .request("POST", getFullRecruitmentUrl("vacancies"), vacancy)
-      .then((response) => {
-        return response.body.data.id;
-      });
+      .then((response) => response.body.data.id);
   }
 
   static getVacancies(): Cypress.Chainable<ResponseVacancy[]> {
     return cy
       .request("GET", getFullRecruitmentUrl("vacancies"))
-      .then((response) => {
-        return response.body.data as ResponseVacancy[];
-      });
+      .then((response) => response.body.data);
   }
 
-  static filterOnVacancyID(
-    vacancyId: number
+  static getVacancyByName(
+    vacancyName: string
   ): Cypress.Chainable<ResponseVacancy> {
     return this.getVacancies().then((vacancies: ResponseVacancy[]) => {
       const foundVacancy = vacancies.find(
-        (vacancy: ResponseVacancy) => vacancy.id === vacancyId
+        (vacancy: ResponseVacancy) => vacancy.name === vacancyName
       );
-
-      if (!foundVacancy) {
-        throw new Error(`Vacancy with ID ${vacancyId} not found`);
-      }
-
       return foundVacancy;
     });
   }
 
-  static deleteVacancy(vacancyId: number) {
-    return this.filterOnVacancyID(vacancyId).then(
-      (foundVacancy: ResponseVacancy) => {
-        return cy.request({
+  static deleteVacancy(vacancyName: string) {
+    this.getVacancyByName(vacancyName).then((foundVacancy: ResponseVacancy) => {
+      if (foundVacancy) {
+        cy.request({
           method: "DELETE",
           url: getFullRecruitmentUrl("vacancies"),
           body: {
@@ -45,6 +36,6 @@ export default class VacancyDataUtils {
           },
         });
       }
-    );
+    });
   }
 }

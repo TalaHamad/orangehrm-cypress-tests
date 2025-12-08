@@ -7,11 +7,18 @@ export default class CandidateDataUtils {
   static createCandidate(candidate: NewCandidate) {
     return cy
       .request("POST", getFullRecruitmentUrl("candidates"), candidate)
-      .then((response) => {
-        return response.body.data.id;
-      });
+      .then((response) => response.body.data.id);
   }
 
+  // cy.then(() => {
+  //   return cy.then(() => {
+  //     ddfd
+  //     fdfd
+  //     fdfd
+  //     f
+  //     return response
+  //   })
+  // }).then((s) => {s})
   static shortlistCandidate({
     candidateId,
     note,
@@ -131,35 +138,32 @@ export default class CandidateDataUtils {
   static getCandidates(): Cypress.Chainable<ResponseCandidate[]> {
     return cy
       .request("GET", getFullRecruitmentUrl("candidates?model=list"))
-      .then((response) => response.body.data as ResponseCandidate[]);
+      .then((response) => response.body.data);
   }
 
-  static filterOnCandidateID(
-    candidateId: number
+  static getCandidateByFirstName(
+    candidateFirstName: string
   ): Cypress.Chainable<ResponseCandidate> {
     return this.getCandidates().then((candidates: ResponseCandidate[]) => {
       const foundCandidate = candidates.find(
-        (cand: ResponseCandidate) => cand.id === candidateId
+        (cand: ResponseCandidate) => cand.firstName === candidateFirstName
       );
-
-      if (!foundCandidate) {
-        throw new Error(`Candidate with ID ${candidateId} not found`);
-      }
-
       return foundCandidate;
     });
   }
 
-  static deleteCandidate(candidateId: number) {
-    return this.filterOnCandidateID(candidateId).then(
+  static deleteCandidate(candidateFirstName: string) {
+    this.getCandidateByFirstName(candidateFirstName).then(
       (foundCandidate: ResponseCandidate) => {
-        return cy.request({
-          method: "DELETE",
-          url: getFullRecruitmentUrl("candidates"),
-          body: {
-            ids: [foundCandidate.id],
-          },
-        });
+        if (foundCandidate) {
+          cy.request({
+            method: "DELETE",
+            url: getFullRecruitmentUrl("candidates"),
+            body: {
+              ids: [foundCandidate.id],
+            },
+          });
+        }
       }
     );
   }

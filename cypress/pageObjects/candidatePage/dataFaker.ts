@@ -4,7 +4,7 @@ import moment from "moment";
 
 export const getCandidate = (prefix: string = getPrefix()): NewCandidate => {
   return {
-    firstName: `CypressFirst-${prefix}-${generateRandomIntegerOfLength(2)}`,
+    firstName: `CypressFirst-${prefix}-${generateRandomIntegerOfLength(3)}`,
     middleName: "",
     lastName: `CypressLast-${generateRandomIntegerOfLength(4)}`,
     email: `Cypresscand${generateRandomIntegerOfLength(6)}@test.com`,

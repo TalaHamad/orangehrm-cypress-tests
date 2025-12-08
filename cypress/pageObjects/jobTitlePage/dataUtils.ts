@@ -8,35 +8,30 @@ export default class JobTitleDataUtils {
         ...jobTitle,
         specification: null,
       })
-      .then((response) => {
-        return response.body.data.id;
-      });
+      .then((response) => response.body.data.id);
   }
 
   static getJobTitles(): Cypress.Chainable<ResponseJobTitle[]> {
-    return cy.request("GET", getFullAdminUrl("job-titles")).then((response) => {
-      return response.body.data as ResponseJobTitle[];
-    });
+    return cy
+      .request("GET", getFullAdminUrl("job-titles"))
+      .then((response) => response.body.data);
   }
 
-  static filterOnJobTitle(jobId: number): Cypress.Chainable<ResponseJobTitle> {
+  static getJobTitleByTitle(
+    title: string
+  ): Cypress.Chainable<ResponseJobTitle> {
     return this.getJobTitles().then((jobTitles: ResponseJobTitle[]) => {
       const foundJobTitle = jobTitles.find(
-        (jobTitle: ResponseJobTitle) => jobTitle.id === jobId
+        (jobTitle: ResponseJobTitle) => jobTitle.title === title
       );
-
-      if (!foundJobTitle) {
-        throw new Error(`Job title with ID ${jobId} not found`);
-      }
-
       return foundJobTitle;
     });
   }
 
-  static deleteJobTitle(jobTitleId: number) {
-    return this.filterOnJobTitle(jobTitleId).then(
-      (foundJobTitle: ResponseJobTitle) => {
-        return cy.request({
+  static deleteJobTitle(title: string) {
+    this.getJobTitleByTitle(title).then((foundJobTitle: ResponseJobTitle) => {
+      if (foundJobTitle) {
+        cy.request({
           method: "DELETE",
           url: getFullAdminUrl("job-titles"),
           body: {
@@ -44,6 +39,6 @@ export default class JobTitleDataUtils {
           },
         });
       }
-    );
+    });
   }
 }
