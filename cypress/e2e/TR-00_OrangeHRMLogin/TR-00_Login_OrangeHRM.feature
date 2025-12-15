@@ -1,41 +1,41 @@
 Feature: OrangeHRM Login Functionality
 
   Background:
-    Given user is on the OrangeHRM login page
+    Given User is on the OrangeHRM login page
 
   @positive @login
   Scenario: Successful login with valid credentials
-    When user enters username "Admin"
-    And user enters password "admin123"
-    And user clicks the login button
-    Then user should be redirected to the dashboard
+    When User enters username "Admin"
+    And User enters password "admin123"
+    And User clicks the login button
+    Then User should be redirected to the dashboard
 
   @negative @login @validation
   Scenario: Required field validation for empty username
-    When user leaves username field empty
-    And user enters password "admin123"
-    And user clicks the login button
-    Then user should see username required error message
+    When User leaves username field empty
+    And User enters password "admin123"
+    And User clicks the login button
+    Then User should see username required error message
 
   @negative @login @validation
   Scenario: Required field validation for empty password
-    When user enters username "Admin"
-    And user leaves password field empty
-    And user clicks the login button
-    Then user should see password required error message
+    When User enters username "Admin"
+    And User leaves password field empty
+    And User clicks the login button
+    Then User should see password required error message
 
   @negative @login @validation
   Scenario: Required field validation for both empty fields
-    When user leaves both username and password fields empty
-    And user clicks the login button
-    Then user should see both fields required error message
+    When User leaves both username and password fields empty
+    And User clicks the login button
+    Then User should see both fields required error message
 
   @negative @login @credentials
   Scenario Outline: Invalid credentials show authentication error
-    When user enters username "<username>"
-    And user enters password "<password>"
-    And user clicks the login button
-    Then user should see "Invalid credentials" error message
+    When User enters username "<username>"
+    And User enters password "<password>"
+    And User clicks the login button
+    Then User should see "Invalid credentials" error message
 
     Examples:
       | username        | password        |
@@ -45,5 +45,5 @@ Feature: OrangeHRM Login Functionality
 
   @forgot-password @login
   Scenario: Access forgot password functionality
-    When user clicks on the "Forgot your password?" link
-    Then user should be redirected to the password reset page
+    When User clicks on the "Forgot your password?" link
+    Then User should be redirected to the password reset page

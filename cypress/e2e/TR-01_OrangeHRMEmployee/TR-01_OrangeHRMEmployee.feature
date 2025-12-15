@@ -1,5 +1,4 @@
 Feature: OrangeHRM Employees
     Scenario: Create and delete an employee via API
-        Given the system has a candidate
-
-
+        Given The system has an employee
+        When That employee is deleted

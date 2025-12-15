@@ -1,4 +1,4 @@
-import { getFullRecruitmentUrl } from "@support/utils";
+import { getFullUrl } from "@support/utils";
 import { NewCandidate, ResponseCandidate } from "./types";
 import { mapInterviewToRequest } from "@pageObjects/employeePage/mappers";
 import EmployeeDataUtils from "@pageObjects/employeePage/dataUtils";
@@ -6,19 +6,17 @@ import EmployeeDataUtils from "@pageObjects/employeePage/dataUtils";
 export default class CandidateDataUtils {
   static createCandidate(candidate: NewCandidate) {
     return cy
-      .request("POST", getFullRecruitmentUrl("candidates"), candidate)
+      .request(
+        "POST",
+        getFullUrl({
+          page: "recruitment",
+          endpoint: "candidates",
+        }),
+        candidate
+      )
       .then((response) => response.body.data.id);
   }
 
-  // cy.then(() => {
-  //   return cy.then(() => {
-  //     ddfd
-  //     fdfd
-  //     fdfd
-  //     f
-  //     return response
-  //   })
-  // }).then((s) => {s})
   static shortlistCandidate({
     candidateId,
     note,
@@ -46,9 +44,11 @@ export default class CandidateDataUtils {
       return cy
         .request({
           method: "POST",
-          url: getFullRecruitmentUrl(
-            `candidates/${candidateId}/shedule-interview`
-          ),
+          url: getFullUrl({
+            page: "recruitment",
+            endpoint: `candidates/${candidateId}/shedule-interview`,
+          }),
+
           body: mapInterviewToRequest(
             interviewDate,
             interviewName,
@@ -76,9 +76,10 @@ export default class CandidateDataUtils {
   }) {
     return cy.request({
       method: "PUT",
-      url: getFullRecruitmentUrl(
-        `candidates/${candidateId}/interviews/${interviewId}/${result}`
-      ),
+      url: getFullUrl({
+        page: "recruitment",
+        endpoint: `candidates/${candidateId}/interviews/${interviewId}/${result}`,
+      }),
       body: { note },
     });
   }
@@ -130,14 +131,23 @@ export default class CandidateDataUtils {
   ) {
     return cy.request({
       method: "PUT",
-      url: getFullRecruitmentUrl(`candidates/${candidateId}/${endpoint}`),
+      url: getFullUrl({
+        page: "recruitment",
+        endpoint: `candidates/${candidateId}/${endpoint}`,
+      }),
       body: { note },
     });
   }
 
   static getCandidates(): Cypress.Chainable<ResponseCandidate[]> {
     return cy
-      .request("GET", getFullRecruitmentUrl("candidates?model=list"))
+      .request(
+        "GET",
+        getFullUrl({
+          page: "recruitment",
+          endpoint: "candidates?model=list",
+        })
+      )
       .then((response) => response.body.data);
   }
 
@@ -158,7 +168,10 @@ export default class CandidateDataUtils {
         if (foundCandidate) {
           cy.request({
             method: "DELETE",
-            url: getFullRecruitmentUrl("candidates"),
+            url: getFullUrl({
+              page: "recruitment",
+              endpoint: "candidates",
+            }),
             body: {
               ids: [foundCandidate.id],
             },

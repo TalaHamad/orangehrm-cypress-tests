@@ -1,4 +1,6 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
+import CandidatePageActions from "@pageObjects/candidatePage/actions";
+import CandidatePageAssertions from "@pageObjects/candidatePage/assertions";
 import { getCandidate } from "@pageObjects/candidatePage/dataFaker";
 import CandidateDataUtils from "@pageObjects/candidatePage/dataUtils";
 import { NewCandidate } from "@pageObjects/candidatePage/types";
@@ -26,8 +28,6 @@ let candidate: NewCandidate;
 let interview: InterviewData;
 
 let candidateId = 0;
-let firstInterviewId = 0;
-let secondInterviewId = 0;
 
 beforeEach(() => {
   employee = getEmployee();
@@ -38,13 +38,11 @@ beforeEach(() => {
   interview = getInterviewData();
 
   candidateId = 0;
-  firstInterviewId = 0;
-  secondInterviewId = 0;
 });
 
 Given("The system has a hiring manager", () => {
   EmployeeDataUtils.createEmployee(employee).then((empNumber) => {
-    return UserDataUtils.createUser({ ...user, empNumber }).then(() => {
+    UserDataUtils.createUser({ ...user, empNumber }).then(() => {
       vacancy.employeeId = empNumber;
     });
   });
@@ -62,424 +60,380 @@ Given("The system has a vacancy", () => {
   });
 });
 
-Given("A candidate exists with Application Initiated status", () => {
-  CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
-    candidateId = candidateid;
-  });
-});
-
-Given("A candidate exists with Shortlisted status", () => {
-  return CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
-    candidateId = candidateid;
-    return CandidateDataUtils.shortlistCandidate({
-      candidateId: candidateid,
-      note: "Setup Shortlisted",
-    });
-  });
-});
-
-Given("A candidate exists with Interview Scheduled status", () => {
-  CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
-    candidateId = candidateid;
-    return CandidateDataUtils.shortlistCandidate({
-      candidateId: candidateid,
-      note: "Setup Shortlisted",
-    }).then(() => {
-      return CandidateDataUtils.scheduleInterviewCandidate({
-        candidateId: candidateid,
-        interviewDate: interview.interviewDate,
-        interviewName: interview.interviewName,
-        interviewTime: interview.interviewTime,
-        note: "Setup for Interview Scheduled status",
-      }).then((interviewId) => {
-        firstInterviewId = interviewId;
-      });
-    });
-  });
-});
-
-Given("A candidate exists with Interview Failed status", () => {
-  CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
-    candidateId = candidateid;
-    return CandidateDataUtils.shortlistCandidate({
-      candidateId: candidateid,
-      note: "Setup Shortlisted",
-    })
-      .then(() => {
-        return CandidateDataUtils.scheduleInterviewCandidate({
-          candidateId: candidateid,
-          interviewDate: interview.interviewDate,
-          interviewName: interview.interviewName,
-          interviewTime: interview.interviewTime,
-          note: "Setup for Interview",
-        });
-      })
-      .then((interviewId) => {
-        return CandidateDataUtils.updateInterviewResult({
-          candidateId: candidateid,
-          interviewId: interviewId,
-          note: "Setup for Interview Failed status",
-          result: "fail",
-        });
-      });
-  });
-});
-
-Given("A candidate exists with Interview Passed status", () => {
-  CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
-    candidateId = candidateid;
-    return CandidateDataUtils.shortlistCandidate({
-      candidateId: candidateid,
-      note: "Setup Shortlisted",
-    })
-      .then(() => {
-        return CandidateDataUtils.scheduleInterviewCandidate({
-          candidateId: candidateid,
-          interviewDate: interview.interviewDate,
-          interviewName: interview.interviewName,
-          interviewTime: interview.interviewTime,
-          note: "Setup for Interview",
-        });
-      })
-      .then((interviewId) => {
-        return CandidateDataUtils.updateInterviewResult({
-          candidateId: candidateid,
-          interviewId: interviewId,
-          note: "Setup for Interview Passed status",
-          result: "pass",
-        });
-      });
-  });
-});
-
 Given(
-  "A candidate exists with Interview Scheduled status after first interview passed",
+  "A candidate is displayed on the candidate details page with Application Initiated status",
   () => {
     CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
       candidateId = candidateid;
-      return CandidateDataUtils.shortlistCandidate({
-        candidateId: candidateid,
-        note: "Setup Shortlisted",
-      })
-        .then(() => {
-          return CandidateDataUtils.scheduleInterviewCandidate({
-            candidateId: candidateid,
-            interviewDate: interview.interviewDate,
-            interviewName: interview.interviewName,
-            interviewTime: interview.interviewTime,
-            note: "First interview setup",
-          });
-        })
-        .then((firstInterviewId) => {
-          return CandidateDataUtils.updateInterviewResult({
-            candidateId: candidateid,
-            interviewId: firstInterviewId,
-            note: "First interview passed",
-            result: "pass",
-          });
-        })
-        .then(() => {
-          return CandidateDataUtils.scheduleInterviewCandidate({
-            candidateId: candidateid,
-            interviewDate: interview.interviewDate,
-            interviewName: interview.interviewName,
-            interviewTime: interview.interviewTime,
-            note: "Second interview setup",
-          }).then((secondInterviewid) => {
-            secondInterviewId = secondInterviewid;
-          });
-        });
+      CandidatePageActions.visitCandidatePage(candidateid);
     });
   }
 );
 
 Given(
-  "A candidate exists with Interview Failed status after second interview",
+  "A candidate is displayed on the candidate details page with Shortlisted status",
   () => {
     CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
       candidateId = candidateid;
-      return CandidateDataUtils.shortlistCandidate({
+      CandidateDataUtils.shortlistCandidate({
         candidateId: candidateid,
         note: "Setup Shortlisted",
-      })
-        .then(() => {
-          return CandidateDataUtils.scheduleInterviewCandidate({
-            candidateId: candidateid,
-            interviewDate: interview.interviewDate,
-            interviewName: interview.interviewName,
-            interviewTime: interview.interviewTime,
-            note: "First interview setup",
-          });
+      }).then(() => {
+        CandidatePageActions.visitCandidatePage(candidateid);
+      });
+    });
+  }
+);
+
+Given(
+  "A candidate is displayed on the candidate details page with Interview Scheduled status",
+  () => {
+    CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
+      candidateId = candidateid;
+      CandidateDataUtils.shortlistCandidate({
+        candidateId: candidateid,
+        note: "Setup Shortlisted",
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
+          candidateId: candidateid,
+          interviewDate: interview.interviewDate,
+          interviewName: interview.interviewTitle,
+          interviewTime: interview.interviewTime,
+          note: "Setup for Interview Scheduled status",
+        }).then(() => {
+          CandidatePageActions.visitCandidatePage(candidateid);
         })
-        .then((firstInterviewId) => {
-          return CandidateDataUtils.updateInterviewResult({
+      );
+    });
+  }
+);
+
+Given(
+  "A candidate is displayed on the candidate details page with Interview Failed status",
+  () => {
+    CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
+      candidateId = candidateid;
+      CandidateDataUtils.shortlistCandidate({
+        candidateId: candidateid,
+        note: "Setup Shortlisted",
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
+          candidateId: candidateid,
+          interviewDate: interview.interviewDate,
+          interviewName: interview.interviewTitle,
+          interviewTime: interview.interviewTime,
+          note: "Setup for Interview",
+        }).then((interviewId) =>
+          CandidateDataUtils.updateInterviewResult({
             candidateId: candidateid,
-            interviewId: firstInterviewId,
-            note: "First interview passed",
-            result: "pass",
-          });
-        })
-        .then(() => {
-          return CandidateDataUtils.scheduleInterviewCandidate({
-            candidateId: candidateid,
-            interviewDate: interview.interviewDate,
-            interviewName: interview.interviewName,
-            interviewTime: interview.interviewTime,
-            note: "Second interview setup",
-          });
-        })
-        .then((secondInterviewId) => {
-          return CandidateDataUtils.updateInterviewResult({
-            candidateId: candidateid,
-            interviewId: secondInterviewId,
-            note: "Second interview failed",
+            interviewId: interviewId,
+            note: "Setup for Interview Failed status",
             result: "fail",
-          });
-        });
+          }).then(() => {
+            CandidatePageActions.visitCandidatePage(candidateid);
+          })
+        )
+      );
     });
   }
 );
 
 Given(
-  "A candidate exists with Interview Passed status after second interview",
+  "A candidate is displayed on the candidate details page with Interview Passed status",
   () => {
     CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
       candidateId = candidateid;
-      return CandidateDataUtils.shortlistCandidate({
+      CandidateDataUtils.shortlistCandidate({
         candidateId: candidateid,
         note: "Setup Shortlisted",
-      })
-        .then(() => {
-          return CandidateDataUtils.scheduleInterviewCandidate({
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
+          candidateId: candidateid,
+          interviewDate: interview.interviewDate,
+          interviewName: interview.interviewTitle,
+          interviewTime: interview.interviewTime,
+          note: "Setup for Interview",
+        }).then((interviewId) =>
+          CandidateDataUtils.updateInterviewResult({
             candidateId: candidateid,
-            interviewDate: interview.interviewDate,
-            interviewName: interview.interviewName,
-            interviewTime: interview.interviewTime,
-            note: "First interview setup",
-          });
-        })
-        .then((firstInterviewId) => {
-          return CandidateDataUtils.updateInterviewResult({
+            interviewId: interviewId,
+            note: "Setup for Interview Passed status",
+            result: "pass",
+          }).then(() => {
+            CandidatePageActions.visitCandidatePage(candidateid);
+          })
+        )
+      );
+    });
+  }
+);
+
+Given(
+  "A candidate is displayed on the candidate details page with Interview Scheduled status after first interview passed",
+  () => {
+    CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
+      candidateId = candidateid;
+      CandidateDataUtils.shortlistCandidate({
+        candidateId: candidateid,
+        note: "Setup Shortlisted",
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
+          candidateId: candidateid,
+          interviewDate: interview.interviewDate,
+          interviewName: interview.interviewTitle,
+          interviewTime: interview.interviewTime,
+          note: "First interview setup",
+        }).then((firstInterviewId) =>
+          CandidateDataUtils.updateInterviewResult({
             candidateId: candidateid,
             interviewId: firstInterviewId,
             note: "First interview passed",
             result: "pass",
-          });
-        })
-        .then(() => {
-          return CandidateDataUtils.scheduleInterviewCandidate({
+          }).then(() =>
+            CandidateDataUtils.scheduleInterviewCandidate({
+              candidateId: candidateid,
+              interviewDate: interview.interviewDate,
+              interviewName: interview.interviewTitle,
+              interviewTime: interview.interviewTime,
+              note: "Second interview setup",
+            }).then(() => {
+              CandidatePageActions.visitCandidatePage(candidateid);
+            })
+          )
+        )
+      );
+    });
+  }
+);
+
+Given(
+  "A candidate is displayed on the candidate details page with Interview Failed status after second interview",
+  () => {
+    CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
+      candidateId = candidateid;
+      CandidateDataUtils.shortlistCandidate({
+        candidateId: candidateid,
+        note: "Setup Shortlisted",
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
+          candidateId: candidateid,
+          interviewDate: interview.interviewDate,
+          interviewName: interview.interviewTitle,
+          interviewTime: interview.interviewTime,
+          note: "First interview setup",
+        }).then((firstInterviewId) =>
+          CandidateDataUtils.updateInterviewResult({
             candidateId: candidateid,
-            interviewDate: interview.interviewDate,
-            interviewName: interview.interviewName,
-            interviewTime: interview.interviewTime,
-            note: "Second interview setup",
-          });
-        })
-        .then((secondInterviewId) => {
-          return CandidateDataUtils.updateInterviewResult({
-            candidateId: candidateid,
-            interviewId: secondInterviewId,
-            note: "Second interview passed",
+            interviewId: firstInterviewId,
+            note: "First interview passed",
             result: "pass",
-          });
-        });
+          }).then(() =>
+            CandidateDataUtils.scheduleInterviewCandidate({
+              candidateId: candidateid,
+              interviewDate: interview.interviewDate,
+              interviewName: interview.interviewTitle,
+              interviewTime: interview.interviewTime,
+              note: "Second interview setup",
+            }).then((secondInterviewId) =>
+              CandidateDataUtils.updateInterviewResult({
+                candidateId: candidateid,
+                interviewId: secondInterviewId,
+                note: "Second interview failed",
+                result: "fail",
+              }).then(() => {
+                CandidatePageActions.visitCandidatePage(candidateid);
+              })
+            )
+          )
+        )
+      );
     });
   }
 );
 
-Given("A candidate exists with Job Offered status", () => {
-  CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
-    candidateId = candidateid;
-    return CandidateDataUtils.shortlistCandidate({
-      candidateId: candidateid,
-      note: "Setup Shortlisted",
-    })
-      .then(() => {
-        return CandidateDataUtils.scheduleInterviewCandidate({
+Given(
+  "A candidate is displayed on the candidate details page with Interview Passed status after second interview",
+  () => {
+    CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
+      candidateId = candidateid;
+      CandidateDataUtils.shortlistCandidate({
+        candidateId: candidateid,
+        note: "Setup Shortlisted",
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
           candidateId: candidateid,
           interviewDate: interview.interviewDate,
-          interviewName: interview.interviewName,
+          interviewName: interview.interviewTitle,
           interviewTime: interview.interviewTime,
-          note: "Setup for Interview",
-        });
-      })
-      .then((interviewId) => {
-        return CandidateDataUtils.updateInterviewResult({
-          candidateId: candidateid,
-          interviewId: interviewId,
-          note: "Setup for Interview Passed status",
-          result: "pass",
-        });
-      })
-      .then(() => {
-        return CandidateDataUtils.offerJob({
-          candidateId: candidateid,
-          note: "Setup for Job Offered status",
-        });
-      });
-  });
-});
+          note: "First interview setup",
+        }).then((firstInterviewId) =>
+          CandidateDataUtils.updateInterviewResult({
+            candidateId: candidateid,
+            interviewId: firstInterviewId,
+            note: "First interview passed",
+            result: "pass",
+          }).then(() =>
+            CandidateDataUtils.scheduleInterviewCandidate({
+              candidateId: candidateid,
+              interviewDate: interview.interviewDate,
+              interviewName: interview.interviewTitle,
+              interviewTime: interview.interviewTime,
+              note: "Second interview setup",
+            }).then((secondInterviewId) =>
+              CandidateDataUtils.updateInterviewResult({
+                candidateId: candidateid,
+                interviewId: secondInterviewId,
+                note: "Second interview passed",
+                result: "pass",
+              }).then(() => {
+                CandidatePageActions.visitCandidatePage(candidateid);
+              })
+            )
+          )
+        )
+      );
+    });
+  }
+);
 
-Given("A candidate exists with Offer Declined status", () => {
-  CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
-    candidateId = candidateid;
-    return CandidateDataUtils.shortlistCandidate({
-      candidateId: candidateid,
-      note: "Setup Shortlisted",
-    })
-      .then(() => {
-        return CandidateDataUtils.scheduleInterviewCandidate({
+Given(
+  "A candidate is displayed on the candidate details page with Job Offered status",
+  () => {
+    CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
+      candidateId = candidateid;
+      CandidateDataUtils.shortlistCandidate({
+        candidateId: candidateid,
+        note: "Setup Shortlisted",
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
           candidateId: candidateid,
           interviewDate: interview.interviewDate,
-          interviewName: interview.interviewName,
+          interviewName: interview.interviewTitle,
           interviewTime: interview.interviewTime,
           note: "Setup for Interview",
-        });
-      })
-      .then((interviewId) => {
-        return CandidateDataUtils.updateInterviewResult({
+        }).then((interviewId) =>
+          CandidateDataUtils.updateInterviewResult({
+            candidateId: candidateid,
+            interviewId: interviewId,
+            note: "Setup for Interview Passed status",
+            result: "pass",
+          }).then(() =>
+            CandidateDataUtils.offerJob({
+              candidateId: candidateid,
+              note: "Setup for Job Offered status",
+            }).then(() => {
+              CandidatePageActions.visitCandidatePage(candidateid);
+            })
+          )
+        )
+      );
+    });
+  }
+);
+
+Given(
+  "A candidate is displayed on the candidate details page with Offer Declined status",
+  () => {
+    CandidateDataUtils.createCandidate(candidate).then((candidateid) => {
+      candidateId = candidateid;
+      CandidateDataUtils.shortlistCandidate({
+        candidateId: candidateid,
+        note: "Setup Shortlisted",
+      }).then(() =>
+        CandidateDataUtils.scheduleInterviewCandidate({
           candidateId: candidateid,
-          interviewId: interviewId,
-          note: "Setup for Interview Passed status",
-          result: "pass",
-        });
-      })
-      .then(() => {
-        return CandidateDataUtils.offerJob({
-          candidateId: candidateid,
-          note: "Setup for Job Offered status",
-        });
-      })
-      .then(() => {
-        return CandidateDataUtils.declineOffer({
-          candidateId: candidateid,
-          note: "Setup for Offer Declined status",
-        });
-      });
-  });
-});
-
-When("The candidate is rejected with note {string}", (note: string) => {
-  CandidateDataUtils.rejectCandidate({
-    candidateId: candidateId,
-    note: note,
-  });
-});
-
-When("The candidate is shortlisted with note {string}", (note: string) => {
-  CandidateDataUtils.shortlistCandidate({
-    candidateId: candidateId,
-    note: note,
-  });
-});
-
-When(
-  "The first interview is scheduled for the candidate with note {string}",
-  (note: string) => {
-    return CandidateDataUtils.scheduleInterviewCandidate({
-      candidateId: candidateId,
-      interviewDate: interview.interviewDate,
-      interviewName: interview.interviewName,
-      interviewTime: interview.interviewTime,
-      note: note,
-    }).then((interviewId) => {
-      firstInterviewId = interviewId;
+          interviewDate: interview.interviewDate,
+          interviewName: interview.interviewTitle,
+          interviewTime: interview.interviewTime,
+          note: "Setup for Interview",
+        }).then((interviewId) =>
+          CandidateDataUtils.updateInterviewResult({
+            candidateId: candidateid,
+            interviewId: interviewId,
+            note: "Setup for Interview Passed status",
+            result: "pass",
+          }).then(() =>
+            CandidateDataUtils.offerJob({
+              candidateId: candidateid,
+              note: "Setup for Job Offered status",
+            }).then(() =>
+              CandidateDataUtils.declineOffer({
+                candidateId: candidateid,
+                note: "Setup for Offer Declined status",
+              }).then(() => {
+                CandidatePageActions.visitCandidatePage(candidateid);
+              })
+            )
+          )
+        )
+      );
     });
   }
 );
 
-When(
-  "The first interview is marked as passed with note {string}",
-  (note: string) => {
-    CandidateDataUtils.updateInterviewResult({
-      candidateId: candidateId,
-      interviewId: firstInterviewId,
-      note: note,
-      result: "pass",
-    });
-  }
-);
-
-When(
-  "The first interview is marked as failed with note {string}",
-  (note: string) => {
-    CandidateDataUtils.updateInterviewResult({
-      candidateId: candidateId,
-      interviewId: firstInterviewId,
-      note: note,
-      result: "fail",
-    });
-  }
-);
-
-When(
-  "The second interview is scheduled for the candidate with note {string}",
-  (note: string) => {
-    return CandidateDataUtils.scheduleInterviewCandidate({
-      candidateId: candidateId,
-      interviewDate: interview.interviewDate,
-      interviewName: interview.interviewName,
-      interviewTime: interview.interviewTime,
-      note: note,
-    }).then((interviewId) => {
-      secondInterviewId = interviewId;
-    });
-  }
-);
-
-When(
-  "The second interview is marked as passed with note {string}",
-  (note: string) => {
-    CandidateDataUtils.updateInterviewResult({
-      candidateId: candidateId,
-      interviewId: secondInterviewId,
-      note: note,
-      result: "pass",
-    });
-  }
-);
-
-When(
-  "The second interview is marked as failed with note {string}",
-  (note: string) => {
-    CandidateDataUtils.updateInterviewResult({
-      candidateId: candidateId,
-      interviewId: secondInterviewId,
-      note: note,
-      result: "fail",
-    });
-  }
-);
-
-When("A job is offered to the candidate with note {string}", (note: string) => {
-  CandidateDataUtils.offerJob({
-    candidateId: candidateId,
-    note: note,
-  });
+When("The {string} button is clicked", (action: string) => {
+  CandidatePageActions.clickAction(action);
 });
 
-When("The offer is marked as declined with note {string}", (note: string) => {
-  CandidateDataUtils.declineOffer({
-    candidateId: candidateId,
-    note: note,
-  });
+When(
+  "The {string} form is displayed with candidate information on the Candidate Change Status Page",
+  (status: string) => {
+    CandidatePageAssertions.verifyOnChangeStatusPage();
+    CandidatePageAssertions.verifyFormIsOpen(status);
+
+    CandidatePageAssertions.verifyCandidateName(
+      `${candidate.firstName}  ${candidate.lastName}`
+    )
+      .verifyCandidateVacancy(vacancy.name)
+      .verifyCandidateHiringManager(
+        `${employee.firstName} ${employee.middleName} ${employee.lastName}`
+      );
+
+    CandidateDataUtils.getCandidateByFirstName(candidate.firstName).then(
+      (candidate) => {
+        CandidatePageAssertions.verifyCandidateCurrentStatus(candidate);
+      }
+    );
+  }
+);
+
+When("The interview details is entered", () => {
+  CandidatePageActions.fillInterviewTitle(interview.interviewTitle)
+    .fillInterviewer(`${employee.firstName} ${employee.lastName}`)
+    .fillInterviewDate(interview.interviewDate);
 });
 
-When("The candidate is hired with note {string}", (note: string) => {
-  CandidateDataUtils.hireCandidate({
-    candidateId: candidateId,
-    note: note,
-  });
+When("The note {string} is entered", (note: string) => {
+  CandidatePageActions.fillNote(note);
 });
 
-Then("The candidate status should be {string}", (expectedStatus: string) => {
-  cy.wait(1000);
-  CandidateDataUtils.getCandidateByFirstName(candidate.firstName).then(
-    (candidate) => {
-      expect(candidate.status.label).to.equal(expectedStatus);
-    }
-  );
+When("The action is saved", () => {
+  CandidatePageActions.clickAction("Save");
 });
+
+When("The action is canceled", () => {
+  CandidatePageActions.clickAction("Cancel");
+});
+
+Then(
+  "The system should be redirected to the candidate details page and the status of the candidate should be {string}",
+  (expectedStatus: string) => {
+    CandidatePageAssertions.verifyOnCandidateDetailsPage(candidateId);
+    CandidatePageAssertions.verifyCandidateStatusAtCandidateDetailsPage(
+      expectedStatus
+    );
+  }
+);
+
+Then(
+  "The system should be redirected to the candidate details page and the status of the candidate should remain {string}",
+  (expectedStatus: string) => {
+    CandidatePageAssertions.verifyOnCandidateDetailsPage(candidateId);
+    CandidatePageAssertions.verifyCandidateStatusAtCandidateDetailsPage(
+      expectedStatus
+    );
+  }
+);
 
 afterEach(() => {
   cy.then(() => {

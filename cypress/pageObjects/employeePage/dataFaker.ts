@@ -37,7 +37,7 @@ export const getInterviewData = (
 
   return {
     interviewDate: futureDate,
-    interviewName: `CypressInterview-${randomType}-${prefix}-${generateRandomIntegerOfLength(
+    interviewTitle: `CypressInterview-${randomType}-${prefix}-${generateRandomIntegerOfLength(
       5
     )}`,
     interviewTime: formattedTime,

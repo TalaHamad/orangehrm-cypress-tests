@@ -1,19 +1,32 @@
-import { getFullAdminUrl } from "@support/utils";
+import { getFullUrl } from "@support/utils";
 import { NewJobTitle, ResponseJobTitle } from "./types";
 
 export default class JobTitleDataUtils {
   static createJobTitle(jobTitle: NewJobTitle) {
     return cy
-      .request("POST", getFullAdminUrl("job-titles"), {
-        ...jobTitle,
-        specification: null,
-      })
+      .request(
+        "POST",
+        getFullUrl({
+          page: "admin",
+          endpoint: "job-titles",
+        }),
+        {
+          ...jobTitle,
+          specification: null,
+        }
+      )
       .then((response) => response.body.data.id);
   }
 
   static getJobTitles(): Cypress.Chainable<ResponseJobTitle[]> {
     return cy
-      .request("GET", getFullAdminUrl("job-titles"))
+      .request(
+        "GET",
+        getFullUrl({
+          page: "admin",
+          endpoint: "job-titles",
+        })
+      )
       .then((response) => response.body.data);
   }
 
@@ -33,7 +46,10 @@ export default class JobTitleDataUtils {
       if (foundJobTitle) {
         cy.request({
           method: "DELETE",
-          url: getFullAdminUrl("job-titles"),
+          url: getFullUrl({
+            page: "admin",
+            endpoint: "job-titles",
+          }),
           body: {
             ids: [foundJobTitle.id],
           },

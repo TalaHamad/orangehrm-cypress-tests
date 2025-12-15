@@ -17,7 +17,7 @@ export interface ResponseEmployee {
 
 export interface InterviewData {
   interviewDate: string;
-  interviewName: string;
+  interviewTitle: string;
   interviewTime: string;
   note: string;
 }

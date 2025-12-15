@@ -1,17 +1,30 @@
-import { getFullAdminUrl } from "@support/utils";
+import { getFullUrl } from "@support/utils";
 import { NewUser, ResponseUser } from "./types";
 import { mapUserToCreateRequest } from "./mappers";
 
 export default class UserDataUtils {
   static createUser(user: NewUser) {
     return cy
-      .request("POST", getFullAdminUrl("users"), mapUserToCreateRequest(user))
+      .request(
+        "POST",
+        getFullUrl({
+          page: "admin",
+          endpoint: "users",
+        }),
+        mapUserToCreateRequest(user)
+      )
       .then((response) => response.body.data.id);
   }
 
   static getUsers(): Cypress.Chainable<ResponseUser[]> {
     return cy
-      .request("GET", getFullAdminUrl("users"))
+      .request(
+        "GET",
+        getFullUrl({
+          page: "admin",
+          endpoint: "users",
+        })
+      )
       .then((response) => response.body.data);
   }
 
@@ -29,7 +42,10 @@ export default class UserDataUtils {
       if (foundUser) {
         cy.request({
           method: "DELETE",
-          url: getFullAdminUrl("users"),
+          url: getFullUrl({
+            page: "admin",
+            endpoint: "users",
+          }),
           body: {
             ids: [foundUser.id],
           },

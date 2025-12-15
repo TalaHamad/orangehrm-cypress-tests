@@ -1,18 +1,31 @@
-import { getFullPimUrl, getFullRecruitmentUrl } from "@support/utils";
+import { getFullUrl } from "@support/utils";
 import { NewEmployee, ResponseEmployee } from "./types";
 
 export default class EmployeeDataUtils {
   static createEmployee(employee: NewEmployee) {
     return cy
-      .request("POST", getFullPimUrl("employees"), {
-        ...employee,
-      })
+      .request(
+        "POST",
+        getFullUrl({
+          page: "pim",
+          endpoint: "employees",
+        }),
+        {
+          ...employee,
+        }
+      )
       .then((response) => response.body.data.empNumber);
   }
 
   static getEmployees(): Cypress.Chainable<ResponseEmployee[]> {
     return cy
-      .request("GET", getFullPimUrl("employees"))
+      .request(
+        "GET",
+        getFullUrl({
+          page: "pim",
+          endpoint: "employees",
+        })
+      )
       .then((response) => response.body.data);
   }
 
@@ -32,7 +45,10 @@ export default class EmployeeDataUtils {
       if (foundEmployee) {
         cy.request({
           method: "DELETE",
-          url: getFullPimUrl("employees"),
+          url: getFullUrl({
+            page: "pim",
+            endpoint: "employees",
+          }),
           body: {
             ids: [foundEmployee.empNumber],
           },
@@ -45,7 +61,10 @@ export default class EmployeeDataUtils {
     return cy
       .request(
         "GET",
-        getFullRecruitmentUrl("interviewers?nameOrId=CypressEmployee")
+        getFullUrl({
+          page: "recruitment",
+          endpoint: "interviewers?nameOrId=CypressEmployee",
+        })
       )
       .then((response) => response.body.data);
   }

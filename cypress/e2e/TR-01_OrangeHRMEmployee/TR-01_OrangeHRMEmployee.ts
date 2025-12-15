@@ -1,11 +1,13 @@
 import { Given, When, Then } from "@badeball/cypress-cucumber-preprocessor";
-import { getCandidate } from "@pageObjects/candidatePage/dataFaker";
-import CandidateDataUtils from "@pageObjects/candidatePage/dataUtils";
 import { getEmployee } from "@pageObjects/employeePage/dataFaker";
 import EmployeeDataUtils from "@pageObjects/employeePage/dataUtils";
-import { getJobTitle } from "@pageObjects/jobTitlePage/dataFaker";
-import JobTitleDataUtils from "@pageObjects/jobTitlePage/dataUtils";
-import { getUser } from "@pageObjects/userPage/dataFaker";
-import UserDataUtils from "@pageObjects/userPage/dataUtils";
-import { getVacancy } from "@pageObjects/vacancyPage/dataFaker";
-import VacancyDataUtils from "@pageObjects/vacancyPage/dataUtils";
+
+const employee = getEmployee();
+
+Given("The system has an employee", () => {
+  EmployeeDataUtils.createEmployee(employee);
+});
+
+When("That employee is deleted", () => {
+  EmployeeDataUtils.deleteEmployee(employee.employeeId);
+});

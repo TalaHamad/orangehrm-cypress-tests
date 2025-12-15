@@ -26,27 +26,3 @@ export function getFullUrl({
 }) {
   return `/web/index.php/api/v2/${page}/${endpoint}`;
 }
-
-export function getFullPimUrl(endpoint: string) {
-  return `/web/index.php/api/v2/pim/${endpoint}`;
-}
-
-export function getFullDashboardUrl(endpoint: string) {
-  return `/web/index.php/api/v2/dashboard/${endpoint}`;
-}
-
-export function getFullBuzzUrl(endpoint: string) {
-  return `/web/index.php/api/v2/buzz/${endpoint}`;
-}
-
-export function getFullEventsUrl(endpoint: string) {
-  return `/web/index.php/events/${endpoint}`;
-}
-
-export function getFullRecruitmentUrl(endpoint: string) {
-  return `/web/index.php/api/v2/recruitment/${endpoint}`;
-}
-
-export function getFullAdminUrl(endpoint: string) {
-  return `/web/index.php/api/v2/admin/${endpoint}`;
-}

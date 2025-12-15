@@ -1,16 +1,29 @@
-import { getFullRecruitmentUrl } from "@support/utils";
+import { getFullUrl } from "@support/utils";
 import { NewVacancy, ResponseVacancy } from "./types";
 
 export default class VacancyDataUtils {
   static createVacancy(vacancy: NewVacancy) {
     return cy
-      .request("POST", getFullRecruitmentUrl("vacancies"), vacancy)
+      .request(
+        "POST",
+        getFullUrl({
+          page: "recruitment",
+          endpoint: "vacancies",
+        }),
+        vacancy
+      )
       .then((response) => response.body.data.id);
   }
 
   static getVacancies(): Cypress.Chainable<ResponseVacancy[]> {
     return cy
-      .request("GET", getFullRecruitmentUrl("vacancies"))
+      .request(
+        "GET",
+        getFullUrl({
+          page: "recruitment",
+          endpoint: "vacancies",
+        })
+      )
       .then((response) => response.body.data);
   }
 
@@ -30,7 +43,10 @@ export default class VacancyDataUtils {
       if (foundVacancy) {
         cy.request({
           method: "DELETE",
-          url: getFullRecruitmentUrl("vacancies"),
+          url: getFullUrl({
+            page: "recruitment",
+            endpoint: "vacancies",
+          }),
           body: {
             ids: [foundVacancy.id],
           },

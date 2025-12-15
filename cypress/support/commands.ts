@@ -49,6 +49,8 @@ declare global {
         password: string;
       }): Chainable<void>;
       logout(): Chainable<void>;
+      getInputByLabel(label: string): Chainable<void>;
+      getTextareaByLabel(label: string): Chainable<void>;
     }
   }
 }
@@ -65,4 +67,12 @@ Cypress.Commands.add(
 
 Cypress.Commands.add("logout", () => {
   cy.clearCookies();
+});
+
+Cypress.Commands.add("getInputByLabel", (label: string) => {
+  cy.contains("label", label).parents().eq(1).find("input");
+});
+
+Cypress.Commands.add("getTextareaByLabel", (label: string) => {
+  cy.contains("label", label).parents().eq(1).find("textarea");
 });
