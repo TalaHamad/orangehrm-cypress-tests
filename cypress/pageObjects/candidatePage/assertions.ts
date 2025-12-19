@@ -49,8 +49,8 @@ export default class CandidatePageAssertions {
     return this;
   }
 
-  static verifyCandidateCurrentStatus(candidate: ResponseCandidate) {
-    this.checkInputContainsValue("Current Status", candidate.status.label);
+  static verifyCandidateCurrentStatus(CurrentStatus: string) {
+    this.checkInputContainsValue("Current Status", CurrentStatus);
     return this;
   }
 

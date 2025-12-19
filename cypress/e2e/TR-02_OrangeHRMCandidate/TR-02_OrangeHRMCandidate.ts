@@ -375,9 +375,21 @@ When("The {string} button is clicked", (action: string) => {
   CandidatePageActions.clickAction(action);
 });
 
+// const MAP_STATUS = {
+//   "Reject Candidate": "Rejected",
+//   "Shortlist Candidate": "Shortlisted",
+//   "Schedule Interview": "Interview Scheduled",
+//   "Mark Interview Failed": "Interview Failed",
+//   "Mark Interview Passed": "Interview Passed",
+//   "Offer Job": "Job Offered",
+//   "Decline Offer": "Offer Declined",
+//   "Hire Candidate": "Hired",
+// } as const;
+
 When(
   "The {string} form is displayed with candidate information on the Candidate Change Status Page",
   (status: string) => {
+    // I can edit the step and put the current status on it so i can use the status directly
     CandidatePageAssertions.verifyOnChangeStatusPage();
     CandidatePageAssertions.verifyFormIsOpen(status);
 
@@ -391,7 +403,9 @@ When(
 
     CandidateDataUtils.getCandidateByFirstName(candidate.firstName).then(
       (candidate) => {
-        CandidatePageAssertions.verifyCandidateCurrentStatus(candidate);
+        CandidatePageAssertions.verifyCandidateCurrentStatus(
+          candidate.status.label
+        );
       }
     );
   }
